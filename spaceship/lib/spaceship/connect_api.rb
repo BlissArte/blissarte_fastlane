@@ -80,6 +80,7 @@ require 'spaceship/connect_api/models/app_event_localization'
 
 require 'spaceship/connect_api/models/iap/in_app_purchase'
 require 'spaceship/connect_api/models/iap/subscription_group'
+require 'spaceship/connect_api/models/iap/subscription_group_localization'
 require 'spaceship/connect_api/models/iap/subscription_introductory_offer'
 require 'spaceship/connect_api/models/iap/subscription_price_point'
 require 'spaceship/connect_api/models/iap/subscription_price'
