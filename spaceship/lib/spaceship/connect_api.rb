@@ -75,6 +75,9 @@ require 'spaceship/connect_api/models/resolution_center_thread'
 require 'spaceship/connect_api/models/review_rejection'
 require 'spaceship/connect_api/models/actor'
 
+require 'spaceship/connect_api/models/app_event'
+require 'spaceship/connect_api/models/app_event_localization'
+
 module Spaceship
   class ConnectAPI
     MAX_OBJECTS_PER_PAGE_LIMIT = 200

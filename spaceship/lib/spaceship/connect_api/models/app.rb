@@ -308,6 +308,24 @@ module Spaceship
           return resp.to_models
         end
       end
+      
+      #
+      # App Events
+      #
+
+      def get_app_events(client: nil, filter: {}, includes: nil, limit: nil, sort: nil)
+        client ||= Spaceship::ConnectAPI
+        filter ||= {}
+
+        resps = client.get_app_events(app_id: id, filter: filter, includes: includes, limit: limit, sort: sort).all_pages
+        return resps.flat_map(&:to_models)
+      end
+
+      def create_app_event(client: nil, reference_name: nil)
+        client ||= Spaceship::ConnectAPI
+        resp = client.create_app_event(app_id: id, reference_name: reference_name)
+        return resp.to_models.first
+      end
 
       #
       # B2B

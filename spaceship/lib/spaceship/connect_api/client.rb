@@ -3,6 +3,7 @@ require_relative './provisioning/provisioning'
 require_relative './testflight/testflight'
 require_relative './tunes/tunes'
 require_relative './users/users'
+require_relative './blissarte/blissarte'
 
 module Spaceship
   class ConnectAPI
@@ -10,6 +11,15 @@ module Spaceship
       attr_accessor :token
       attr_accessor :tunes_client
       attr_accessor :portal_client
+
+      def self.core_client=(core_client)
+        @@core_client = core_client
+      end
+
+      def self.core_client
+        return @@core_client if @@core_client
+        raise TypeError, "You need to auth with App Store Connect before accessing the core client"
+      end
 
       # Initializes client with Apple's App Store Connect JWT auth key.
       #
@@ -72,7 +82,7 @@ module Spaceship
         return ConnectAPI::Client.new(tunes_client: tunes_client, portal_client: portal_client)
       end
 
-      def initialize(cookie: nil, current_team_id: nil, token: nil, tunes_client: nil, portal_client: nil)
+      def initialize(cookie: nil, current_team_id: nil, token: nil, tunes_client: nil, portal_client: nil, core_client: nil)
         @token = token
 
         # If using web session...
@@ -80,6 +90,7 @@ module Spaceship
         # Spaceship::Portal is needed for Provisioning::API
         @tunes_client = tunes_client
         @portal_client = portal_client
+        @@core_client = core_client
 
         # Extending this instance to add API endpoints from these modules
         # Each of these modules adds a new setter method for an instance
@@ -89,13 +100,15 @@ module Spaceship
         self.extend(Spaceship::ConnectAPI::Tunes::API)
         self.extend(Spaceship::ConnectAPI::Provisioning::API)
         self.extend(Spaceship::ConnectAPI::Users::API)
+        self.extend(Spaceship::ConnectAPI::BlissArte::API)
 
         set_individual_clients(
           cookie: cookie,
           current_team_id: current_team_id,
           token: token,
           tunes_client: @tunes_client,
-          portal_client: @portal_client
+          portal_client: @portal_client,
+          core_client: @@core_client
         )
       end
 
@@ -166,7 +179,7 @@ module Spaceship
 
       private
 
-      def set_individual_clients(cookie: nil, current_team_id: nil, token: nil, tunes_client: nil, portal_client: nil)
+      def set_individual_clients(cookie: nil, current_team_id: nil, token: nil, tunes_client: nil, portal_client: nil, core_client: nil)
         # This was added by Spaceship::ConnectAPI::TestFlight::API and is required
         # to be set for API methods to have a client to send request on
         if cookie || token || tunes_client
@@ -208,6 +221,26 @@ module Spaceship
             current_team_id: current_team_id,
             token: token,
             another_client: tunes_client
+          )
+        end
+
+        # This was added by Spaceship::ConnectAPI::BlissArte::API and is required
+        # to be set for API methods to have a client to send request on
+        if cookie || token || core_client
+          self.blissarte_request_client = Spaceship::ConnectAPI::BlissArte::Client.new(
+            cookie: cookie,
+            current_team_id: current_team_id,
+            token: token,
+            another_client: core_client
+          )
+        end
+
+        if cookie || token || core_client
+          @@core_client = Spaceship::ConnectAPI::APIClient.new(
+            cookie: cookie,
+            current_team_id: current_team_id,
+            token: token,
+            another_client: core_client
           )
         end
       end
