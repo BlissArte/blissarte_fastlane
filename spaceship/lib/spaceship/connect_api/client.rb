@@ -189,7 +189,7 @@ module Spaceship
             cookie: cookie,
             current_team_id: current_team_id,
             token: token,
-            another_client: tunes_client
+            another_client: core_client
           )
         end
 
